@@ -1,0 +1,21 @@
+{
+  "name": "lab3-transport",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ladakonovalenko/lab3-transport.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ladakonovalenko/lab3-transport/issues"
+  },
+  "homepage": "https://github.com/ladakonovalenko/lab3-transport#readme"
+}
