@@ -41,6 +41,15 @@ function getFile(command) {
   return command.optsWithGlobals().file;
 }
 
+function findRoute(data, routeId) {
+  const route = data.routes.find((r) => r.id.toLowerCase() === routeId.toLowerCase());
+  if (!route) {
+    const ids = data.routes.map((r) => r.id).join(', ');
+    throw new AppError(`маршрут «${routeId}» не знайдено. Доступні маршрути: ${ids}`);
+  }
+  return route;
+}
+
 function parsePositiveInt(value, optionName) {
   if (!/^\d+$/.test(value) || Number(value) === 0) {
     throw new AppError(`значення опції ${optionName} має бути цілим числом більшим за 0, отримано «${value}»`, EXIT_USAGE_ERROR);
@@ -74,6 +83,16 @@ program
       console.log(`${route.id.padEnd(6)} ${type.padEnd(10)} № ${route.number.padEnd(4)} ${route.name}`);
     }
     console.log(`\nПоказано маршрутів: ${routes.length} з ${data.routes.length}`);
+  });
+
+program
+  .command('show')
+  .description('показати всі дані одного маршруту')
+  .argument('<routeId>', 'ідентифікатор маршруту, наприклад rt001')
+  .action(async (routeId, options, command) => {
+    const data = await loadData(getFile(command));
+    const route = findRoute(data, routeId);
+    console.log(JSON.stringify(route, null, 2));
   });
 
 function translateCommanderError(err) {
