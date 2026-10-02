@@ -5,6 +5,7 @@ const DEFAULT_FILE = 'data.json';
 const EXIT_DATA_ERROR = 1;
 const EXIT_USAGE_ERROR = 2;
 
+const TYPE_LABELS = { tram: 'трамвай', trolleybus: 'тролейбус', bus: 'автобус' };
 class AppError extends Error {
   constructor(message, exitCode = EXIT_DATA_ERROR) {
     super(message);
@@ -40,6 +41,13 @@ function getFile(command) {
   return command.optsWithGlobals().file;
 }
 
+function parsePositiveInt(value, optionName) {
+  if (!/^\d+$/.test(value) || Number(value) === 0) {
+    throw new AppError(`значення опції ${optionName} має бути цілим числом більшим за 0, отримано «${value}»`, EXIT_USAGE_ERROR);
+  }
+  return Number(value);
+}
+
 const program = new Command();
 
 program
@@ -52,6 +60,21 @@ program
   .configureHelp({ showGlobalOptions: true })
   .exitOverride()
   .configureOutput({ outputError: () => {} });
+
+program
+  .command('list')
+  .description('показати стислий список маршрутів')
+  .option('-l, --limit <number>', 'показати не більше вказаної кількості маршрутів')
+  .action(async (options, command) => {
+    const data = await loadData(getFile(command));
+    const limit = options.limit === undefined ? data.routes.length : parsePositiveInt(options.limit, '--limit');
+    const routes = data.routes.slice(0, limit);
+    for (const route of routes) {
+      const type = TYPE_LABELS[route.type] ?? route.type;
+      console.log(`${route.id.padEnd(6)} ${type.padEnd(10)} № ${route.number.padEnd(4)} ${route.name}`);
+    }
+    console.log(`\nПоказано маршрутів: ${routes.length} з ${data.routes.length}`);
+  });
 
 function translateCommanderError(err) {
   const quoted = err.message.match(/'([^']+)'/)?.[1] ?? '';
