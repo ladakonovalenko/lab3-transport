@@ -194,6 +194,23 @@ program
     console.log(`Маршрут ${routeTitle(route)}, ${label}: інтервал руху ${interval} хв`);
   });
 
+program
+  .command('lowfloor')
+  .description('показати маршрути, на яких працюють низькопідлогові машини')
+  .action(async (options, command) => {
+    const data = await loadData(getFile(command));
+    const routes = data.routes.filter((route) => route.hasLowFloorVehicles === true);
+    if (routes.length === 0) {
+      console.log('Маршрутів з низькопідлоговими машинами немає.');
+      return;
+    }
+    console.log('Маршрути з низькопідлоговими машинами:');
+    for (const route of routes) {
+      console.log(`${routeTitle(route)} ${route.name}`);
+    }
+    console.log(`\nЗнайдено маршрутів: ${routes.length} з ${data.routes.length}`);
+  });
+
 function translateCommanderError(err) {
   const quoted = err.message.match(/'([^']+)'/)?.[1] ?? '';
   switch (err.code) {
