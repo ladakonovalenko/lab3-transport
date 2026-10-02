@@ -1,0 +1,69 @@
+{
+  "cityName": "Львів",
+  "routes": [
+    {
+      "id": "rt001",
+      "number": "22",
+      "type": "trolleybus",
+      "name": "Університет - Автовокзал",
+      "operator": "ЛКП \"Львівелектротранс\"",
+      "hasLowFloorVehicles": true,
+      "schedule": {
+        "weekdayIntervalMinutes": 8,
+        "weekendIntervalMinutes": 12
+      },
+      "stops": [
+        {
+          "id": "st001",
+          "name": "Університет",
+          "latitude": 49.839794406349064,
+          "longitude": 24.022386454345092
+        },
+        {
+          "id": "st002",
+          "name": "Собор Святого Юра",
+          "latitude": 49.8368812548533,
+          "longitude": 24.012815984456026
+        },
+        {
+          "id": "st003",
+          "name": "Площа Кропивницького",
+          "latitude": 49.836567578239055,
+          "longitude": 24.00455008575818
+        }
+      ]
+    },
+    {
+      "id": "rt002",
+      "number": "53",
+      "type": "bus",
+      "name": "Санта Барбара - Галицьке перехрестя",
+      "operator": null,
+      "hasLowFloorVehicles": false,
+      "schedule": {
+        "weekdayIntervalMinutes": 10,
+        "weekendIntervalMinutes": null
+      },
+      "stops": [
+        {
+          "id": "st004",
+          "name": "Санта Барбара",
+          "latitude": 49.78532900374477,
+          "longitude": 24.059453181229703
+        },
+        {
+          "id": "st005",
+          "name": "вул. Коломийська",
+          "latitude": 49.787782574994026,
+          "longitude": 24.059487133082893
+        },
+        {
+          "id": "st006",
+          "name": "Поліклініка №4",
+          "latitude": 49.79080890420022,
+          "longitude": 24.059293997690137
+        }
+      ]
+    }
+  ]
+}
