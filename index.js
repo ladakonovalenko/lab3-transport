@@ -6,6 +6,11 @@ const EXIT_DATA_ERROR = 1;
 const EXIT_USAGE_ERROR = 2;
 
 const TYPE_LABELS = { tram: 'трамвай', trolleybus: 'тролейбус', bus: 'автобус' };
+const DAY_TYPES = {
+  weekdays: { field: 'weekdayIntervalMinutes', label: 'будні' },
+  weekends: { field: 'weekendIntervalMinutes', label: 'вихідні' },
+};
+
 class AppError extends Error {
   constructor(message, exitCode = EXIT_DATA_ERROR) {
     super(message);
@@ -164,6 +169,29 @@ program
       }
       console.log(line);
     });
+  });
+
+program
+  .command('interval')
+  .description('показати інтервал руху маршруту для буднів чи вихідних')
+  .argument('<routeId>', 'ідентифікатор маршруту, наприклад rt001')
+  .option('-d, --day <type>', 'тип дня: weekdays (будні) або weekends (вихідні)', 'weekdays')
+  .action(async (routeId, options, command) => {
+    if (!Object.hasOwn(DAY_TYPES, options.day)) {
+      throw new AppError(`значення опції --day має бути weekdays або weekends, отримано «${options.day}»`, EXIT_USAGE_ERROR);
+    }
+    const { field, label } = DAY_TYPES[options.day];
+    const data = await loadData(getFile(command));
+    const route = findRoute(data, routeId);
+    if (!route.schedule || !Object.hasOwn(route.schedule, field)) {
+      throw new AppError(`для маршруту ${route.id} немає даних про інтервал на ${label}`);
+    }
+    const interval = route.schedule[field];
+    if (interval === null) {
+      console.log(`Маршрут ${routeTitle(route)} у ${label} не курсує.`);
+      return;
+    }
+    console.log(`Маршрут ${routeTitle(route)}, ${label}: інтервал руху ${interval} хв`);
   });
 
 function translateCommanderError(err) {
