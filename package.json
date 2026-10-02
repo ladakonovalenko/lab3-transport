@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/ladakonovalenko/lab3-transport/issues"
   },
-  "homepage": "https://github.com/ladakonovalenko/lab3-transport#readme"
+  "homepage": "https://github.com/ladakonovalenko/lab3-transport#readme",
+  "dependencies": {
+    "commander": "^15.0.0"
+  }
 }
