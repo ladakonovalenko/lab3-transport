@@ -57,6 +57,11 @@ function parsePositiveInt(value, optionName) {
   return Number(value);
 }
 
+function routeTitle(route) {
+  const type = TYPE_LABELS[route.type] ?? route.type;
+  return `${route.id} (${type} № ${route.number})`;
+}
+
 function getByPath(object, path) {
   const parts = path.split('.');
   let current = object;
@@ -138,6 +143,27 @@ program
     const route = findRoute(data, routeId);
     const value = getByPath(route, path);
     console.log(JSON.stringify(value, null, 2));
+  });
+
+program
+  .command('stops')
+  .description('показати зупинки маршруту по порядку')
+  .argument('<routeId>', 'ідентифікатор маршруту, наприклад rt001')
+  .option('-c, --coords', 'додати координати зупинок')
+  .action(async (routeId, options, command) => {
+    const data = await loadData(getFile(command));
+    const route = findRoute(data, routeId);
+    if (!Array.isArray(route.stops) || route.stops.length === 0) {
+      throw new AppError(`для маршруту ${route.id} немає списку зупинок`);
+    }
+    console.log(`Зупинки маршруту ${routeTitle(route)}:`);
+    route.stops.forEach((stop, index) => {
+      let line = `${index + 1}. ${stop.name}`;
+      if (options.coords) {
+        line += ` (${stop.latitude}, ${stop.longitude})`;
+      }
+      console.log(line);
+    });
   });
 
 function translateCommanderError(err) {
