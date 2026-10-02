@@ -57,6 +57,39 @@ function parsePositiveInt(value, optionName) {
   return Number(value);
 }
 
+function getByPath(object, path) {
+  const parts = path.split('.');
+  let current = object;
+  const passed = [];
+
+  for (const part of parts) {
+    if (part === '') {
+      throw new AppError(`некоректний шлях «${path}»: порожня частина між крапками`, EXIT_USAGE_ERROR);
+    }
+    const where = passed.length > 0 ? passed.join('.') : 'маршрут';
+    if (current === null || typeof current !== 'object') {
+      throw new AppError(`поле «${where}» має значення ${JSON.stringify(current)} і не містить вкладених полів`);
+    }
+    if (Array.isArray(current)) {
+      if (!/^\d+$/.test(part)) {
+        throw new AppError(`«${where}» є масивом, тому наступна частина шляху має бути індексом (0, 1, ...), отримано «${part}»`);
+      }
+      const index = Number(part);
+      if (index >= current.length) {
+        throw new AppError(`у масиві «${where}» немає елемента з індексом ${index} (елементів: ${current.length})`);
+      }
+      current = current[index];
+    } else {
+      if (!Object.hasOwn(current, part)) {
+        throw new AppError(`поле «${[...passed, part].join('.')}» відсутнє`);
+      }
+      current = current[part];
+    }
+    passed.push(part);
+  }
+  return current;
+}
+
 const program = new Command();
 
 program
@@ -93,6 +126,18 @@ program
     const data = await loadData(getFile(command));
     const route = findRoute(data, routeId);
     console.log(JSON.stringify(route, null, 2));
+  });
+
+program
+  .command('get')
+  .description('показати значення окремого поля маршруту, зокрема вкладеного')
+  .argument('<routeId>', 'ідентифікатор маршруту, наприклад rt001')
+  .argument('<path>', 'шлях до поля через крапку, індекси масивів — числами (наприклад schedule.weekdayIntervalMinutes або stops.0.name)')
+  .action(async (routeId, path, options, command) => {
+    const data = await loadData(getFile(command));
+    const route = findRoute(data, routeId);
+    const value = getByPath(route, path);
+    console.log(JSON.stringify(value, null, 2));
   });
 
 function translateCommanderError(err) {
